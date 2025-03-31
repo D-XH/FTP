@@ -28,10 +28,8 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < ready_num; i++){
             if(ready_evts[i].data.fd == sock_fd){
                 int net_fd = accept(sock_fd, NULL, NULL);
-                epollAdd(epfd, net_fd, EPOLLIN|EPOLLET);
-            }else{
                 pthread_mutex_lock(&pool.mutex);
-                enqueue(&pool.taskQ, ready_evts[i].data.fd);
+                enqueue(&pool.taskQ, net_fd);
                 pthread_mutex_unlock(&pool.mutex);
                 pthread_cond_signal(&pool.cond);
             }

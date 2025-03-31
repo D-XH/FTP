@@ -13,10 +13,16 @@ enum op{
     RM,
     PWD,
     MKDIR,
-    LOGIN
+    LOGIN,
+    EXIT
 };
+typedef struct command_s{
+    int type;
+    int argc;
+    char argv[2][256];
+}command_t;
 
 void* handler(void* arg);
-int work(threadPool_t* pool, int net_fd);
+int workLoop(int net_fd);
 
 #endif
