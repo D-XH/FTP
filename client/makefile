@@ -11,4 +11,4 @@ cloudDisk_client:$(OBJS)
 	gcc -c $^ -o $@
 
 clean:
-	rm cloudDisk $(OBJS)
+	rm cloudDisk_client $(OBJS)

@@ -14,8 +14,7 @@ ssize_t recvn(int net_fd, void* data, ssize_t n){
 }
 
 int recvFile(int net_fd, char* file_path){
-    printf("file: %s\n", file_path);
-    int file_fd = open(file_path, O_RDWR | O_CREAT | O_TRUNC, 0666);
+    int file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if(file_fd == -1){
         perror("open file");
         return -1;
@@ -25,7 +24,7 @@ int recvFile(int net_fd, char* file_path){
     while(1){
         memset(&data, 0, sizeof(data));
         recvn(net_fd, &data.size, sizeof(data.size));
-        recvn(net_fd, data.buf, data.size);
+        recvn(net_fd, data.buf, data.size) == 0;
         if(data.size == 0){
             break;
         }
