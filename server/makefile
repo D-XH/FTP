@@ -5,7 +5,7 @@ OBJS:=$(patsubst %.c,%.o,$(SRCS))
 APP:cloudDisk
 
 cloudDisk:$(OBJS)
-	gcc $^ -o $@
+	gcc $^ -o $@ -lpthread
 
 %.o:%.c
 	gcc -c $^ -o $@
