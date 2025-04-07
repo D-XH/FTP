@@ -3,13 +3,6 @@
 
 #include "heads.h"
 
-typedef struct userInfo_s{
-    char user[256];
-    char cwd[256];
-}userInfo_t;
-
-userInfo_t* fdToUser[1024];
-
 typedef struct task_s{
     int net_fd;
     struct task_s* pNext;

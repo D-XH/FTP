@@ -6,7 +6,7 @@ ssize_t recvn(int net_fd, void* data, ssize_t n){
     while(cnt < n){
         ssize_t rsize = recv(net_fd, p, n, 0);
         if(rsize == 0){
-            return -1;
+            return 0;
         }
         cnt += rsize;
     }

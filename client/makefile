@@ -1,14 +1,26 @@
 
-SRCS:=$(wildcard *.c)
-OBJS:=$(patsubst %.c,%.o,$(SRCS))
+TARGET:=CD_client
 
-APP:cloudDisk_client
+DIR_SRCS:=./source
+DIR_INC:=./include
+DIR_DEBUG:=./debug
 
-cloudDisk_client:$(OBJS)
-	gcc $^ -o $@
+SRCS:=$(wildcard $(DIR_SRCS)/*.c)
+OBJS:=$(patsubst $(DIR_SRCS)/%.c,$(DIR_DEBUG)/%.o,$(SRCS))
+LIB:=-lpthread
 
-%.o:%.c
-	gcc -c $^ -o $@
+.PHONY:APP, MKDIR, clean
+
+APP:MKDIR $(TARGET)
+
+$(TARGET):$(OBJS)
+	gcc $^ -o $@ $(LIB)
+
+$(DIR_DEBUG)/%.o:$(DIR_SRCS)/%.c
+	gcc -c $^ -o $@ -I $(DIR_INC) 
+
+MKDIR:
+	mkdir -p $(DIR_DEBUG)
 
 clean:
-	rm cloudDisk_client $(OBJS)
+	rm -r $(TARGET) $(DIR_DEBUG)

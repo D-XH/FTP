@@ -7,6 +7,6 @@ int tcpInit(int* sock_fd, struct sockaddr_in* addr, int n){
     setsockopt(*sock_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
     ERR_CHECK(bind(*sock_fd, (struct sockaddr*)addr, sizeof(struct sockaddr_in)), -1, "bind");
-
+    
     ERR_CHECK(listen(*sock_fd, n), -1, "listen");
 }

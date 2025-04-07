@@ -19,4 +19,10 @@
 
 // #define ERR_CHECK(key, val, err) {if(key == val){log_err(err);return -1;}}
 #define ERR_CHECK(key, val, err) {if(key == val){perror(err);return -1;}}
+
+typedef struct data_s{
+    size_t size;
+    char buf[1024];
+}data_t;
+
 #endif

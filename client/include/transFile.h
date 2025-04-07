@@ -15,6 +15,7 @@ typedef struct data_s{
     char buf[1024];
 }data_t;
 
+ssize_t recvn(int net_fd, void* data, ssize_t n);
 int recvFile(int net_fd, char* file_path);
 int trans(int net_fd, char *file_path);
 int trans_mmap(int net_fd, char* file_path);
