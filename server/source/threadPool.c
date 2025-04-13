@@ -19,6 +19,8 @@ int threadPool_init(threadPool_t *pThreadPool, size_t thNum)
     pthread_cond_init(&pThreadPool->cond, NULL);
     // init exit flag
     pThreadPool->exit_flag = 0;
+    //
+    statTree_init(&pThreadPool->loginInfo);
 
     for(int i = 0; i < pThreadPool->threads.length; i++){
         pthread_create(&pThreadPool->threads.pTid[i], NULL, handler, pThreadPool);

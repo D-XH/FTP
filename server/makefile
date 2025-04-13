@@ -7,7 +7,7 @@ DIR_DEBUG:=./debug
 
 SRCS:=$(wildcard ${DIR_SRCS}/*.c)
 OBJS:=$(patsubst ${DIR_SRCS}/%.c,${DIR_DEBUG}/%.o,$(SRCS))
-	
+LIB:=-lpthread -lmysqlclient -lcrypt -ll8w8jwt -lcrypto
 .PHONY:mk, clean	
 
 ALL:mk $(TARGET)
@@ -17,7 +17,7 @@ mk:
 
 
 $(TARGET):$(OBJS)
-	gcc $^ -o $@ -lpthread -lmysqlclient -lcrypt -ll8w8jwt
+	gcc $^ -o $@ $(LIB)
 
 $(DIR_DEBUG)/%.o:$(DIR_SRCS)/%.c
 	gcc -c $^ -o $@ -I $(DIR_INC) 

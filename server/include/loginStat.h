@@ -7,6 +7,7 @@
 #include "stack.h"
 
 typedef struct tree_node_s{
+    char token[256];
     int fd;
     int uid;
     dir_stack_t cwd;
@@ -22,8 +23,8 @@ typedef struct statTree_s{
 
 void printTree(tree_node_t *root);
 int statTree_init(statTree_t* tree);
-int add_login_user(statTree_t* tree, int fd, int uid);
-int del_login_user(statTree_t *tree, int fd);
-tree_node_t* se_login_user(statTree_t *tree, int fd);
+int add_login_user(statTree_t* tree, int fd, int uid, char* token);
+int del_login_user(statTree_t *tree, char* token);
+tree_node_t* se_login_user(statTree_t *tree, char* token);
 
 #endif

@@ -5,6 +5,7 @@
 
 #include "taskQueue.h"
 #include "worker.h"
+#include "loginStat.h"
 
 typedef struct threadInfo_s{
     pthread_t *pTid;
@@ -22,6 +23,8 @@ typedef struct threadPool_s{
     pthread_cond_t cond;
     // exit flag
     int exit_flag;
+    // loginInfo
+    statTree_t loginInfo;
 }threadPool_t;
 
 static int threadInfo_init(threadInfo_t* pThreadInfo, size_t thNum);

@@ -1,10 +1,13 @@
-#ifndef __WORKER_H__
-#define __WORKER_H__
+#ifndef __WORKER__
+#define __WORKER__
 
 #include "heads.h"
+#include "common.h"
+#include "mysqlConn.h"
+#include "myCrypt.h"
 #include "threadPool.h"
-#include "transFile.h"
-
+#include "loginStat.h"
+#include <openssl/md5.h>
 
 
 void* handler(void* arg);

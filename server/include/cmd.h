@@ -2,20 +2,22 @@
 #define __CMD_H__
 
 #include "heads.h"
-#include "jwt.h"
-#include "loginStat.h"
+#include "myCrypt.h"
+#include "threadPool.h"
 #include "mysqlConn.h"
+#include "common.h"
 #include <crypt.h>
 
 enum op{
     CD,
     LS,
-    PUTS,
-    GETS,
+    PUT,
+    GET,
     RM,
     PWD,
     MKDIR,
     LOGIN,
+    LOGOUT,
     REGISTER,
     EXIT
 };
@@ -27,6 +29,6 @@ typedef struct command_s{
     char argv[2][256];
 }command_t;
 
-int process_cmd(int net_fd, statTree_t* loginInfo);
+int process_cmd(int net_fd, threadPool_t* pool);
 
 #endif

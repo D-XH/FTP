@@ -10,7 +10,6 @@ typedef struct cli_info_s
     struct sockaddr_in addr;
 }cli_info_t;
 
-
 int tcpInit(int* sock_fd, struct sockaddr_in* addr, int n);
 
 #endif

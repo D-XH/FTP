@@ -3,6 +3,6 @@
 
 #include "heads.h"
 
-int parse(char* conf_path, struct sockaddr_in* addr);
+int parse_conf(char *conf_path, struct sockaddr_in* cmd_addr, struct sockaddr_in* data_addr);
 
 #endif

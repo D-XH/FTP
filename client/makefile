@@ -7,7 +7,7 @@ DIR_DEBUG:=./debug
 
 SRCS:=$(wildcard $(DIR_SRCS)/*.c)
 OBJS:=$(patsubst $(DIR_SRCS)/%.c,$(DIR_DEBUG)/%.o,$(SRCS))
-LIB:=-lpthread
+LIB:=-lpthread -lcrypto
 
 .PHONY:APP, MKDIR, clean
 

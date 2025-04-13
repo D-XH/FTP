@@ -1,6 +1,8 @@
 #include "tcpLink.h"
 
-int tcpInit(int* sock_fd, struct sockaddr_in* addr, int n){
+
+int tcpInit(int *sock_fd, struct sockaddr_in *addr, int n)
+{
     ERR_CHECK((*sock_fd = socket(AF_INET, SOCK_STREAM, 0)), -1, "socket))");
 
     int reuse = 1;

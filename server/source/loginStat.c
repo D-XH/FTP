@@ -64,7 +64,7 @@ int insertTree(tree_node_t **pRoot, tree_node_t *add_node)
         return 0;
     }
 
-    if(root->fd < add_node->fd){
+    if(strncmp(root->token, add_node->token, sizeof(add_node->token)) < 0){
         insertTree(&root->rchild, add_node);
     }else{
         insertTree(&root->lchild, add_node);
@@ -97,12 +97,13 @@ int insertTree(tree_node_t **pRoot, tree_node_t *add_node)
     return 0;
 }
 
-int delFromTree(tree_node_t** pRoot, int fd){
+int delFromTree(tree_node_t** pRoot, char* token){
     tree_node_t* root = *pRoot;
     if(root == NULL){
         return 0;
     }
-    if(root->fd == fd){
+    int cmp_res = strncmp(root->token, token, sizeof(root->token));
+    if(cmp_res == 0){
         if(root->lchild == NULL && root->rchild == NULL){
             *pRoot = NULL;
             free(root);
@@ -134,12 +135,12 @@ int delFromTree(tree_node_t** pRoot, int fd){
             root->lchild = NULL;
             root->rchild = t;
             root->high = t_Height;
-            delFromTree(&p->rchild, fd);
+            delFromTree(&p->rchild, token);
         }
-    }else if(root->fd < fd){
-        delFromTree(&root->rchild, fd);
+    }else if(cmp_res < 0){
+        delFromTree(&root->rchild, token);
     }else{
-        delFromTree(&root->lchild, fd);
+        delFromTree(&root->lchild, token);
     }
 
     root = *pRoot;
@@ -168,19 +169,20 @@ int delFromTree(tree_node_t** pRoot, int fd){
     }
 }
 
-tree_node_t* find(tree_node_t *root, int fd){
-    if(root == NULL || root->fd == fd){
+tree_node_t* find(tree_node_t *root, char* token){
+    if(root == NULL || strncmp(root->token, token, sizeof(root->token)) == 0){
         return root;
     }
-    if(root->fd < fd){
-        return find(root->rchild, fd);
+    if(strncmp(root->token, token, sizeof(root->token)) < 0){
+        return find(root->rchild, token);
     }else{
-        return find(root->lchild, fd);
+        return find(root->lchild, token);
     }
 }
 
-int changeFromTree(tree_node_t* root, int fd, int uid){
-    tree_node_t* node = find(root, fd);
+int changeFromTree(tree_node_t* root, int fd, int uid, char* token){
+    tree_node_t* node = find(root, token);
+    node->fd = fd;
     node->uid = uid;
     return 0;
 }
@@ -190,7 +192,7 @@ void printTree(tree_node_t *root){
     if(root == NULL){
         return;
     }
-    printf("node fd: %d, height: %d, uid: %d\n", root->fd, root->high, root->uid);
+    printf("node fd: %d, height: %d, uid: %d, token: %s\n", root->fd, root->high, root->uid, root->token);
     printTree(root->lchild);
     printTree(root->rchild);
 }
@@ -202,29 +204,30 @@ int statTree_init(statTree_t *tree)
     return 0;
 }
 
-int add_login_user(statTree_t *tree, int fd, int uid)
+int add_login_user(statTree_t *tree, int fd, int uid, char* token)
 {
     tree_node_t* node = (tree_node_t*)malloc(sizeof(tree_node_t));
     memset(node, 0, sizeof(tree_node_t));
+    memcpy(node->token, token, strlen(token));
     node->fd = fd;
     node->high = 1;
     node->uid = uid;
     node->lchild = node->rchild = NULL;
-    if(find(tree->root, fd) == NULL){
+    if(find(tree->root, token) == NULL){
         insertTree(&tree->root, node);
         tree->size++;
     }else{
-        changeFromTree(tree->root, fd, uid);
+        changeFromTree(tree->root, fd, uid, token);
     }
     return 0;
 }
 
-int del_login_user(statTree_t *tree, int fd){
-    delFromTree(&tree->root, fd);
+int del_login_user(statTree_t *tree, char* token){
+    delFromTree(&tree->root, token);
     tree->size--;
 }
 
-tree_node_t* se_login_user(statTree_t *tree, int fd)
+tree_node_t* se_login_user(statTree_t *tree, char* token)
 {
-    return find(tree->root, fd);
+    return find(tree->root, token);
 }
