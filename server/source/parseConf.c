@@ -15,6 +15,7 @@ int parse_conf(char *conf_path, struct sockaddr_in* cmd_addr, struct sockaddr_in
 
     char* line = strtok(p, "\n");
     while(line != NULL){
+        // printf("line: %s\n", line);
         char* t = strchr(line, '=')+1;
         if(memcmp("cmd_port", line, strlen("cmd_port")) == 0){
             cmd_addr->sin_port = htons(atoi(t));
@@ -29,16 +30,46 @@ int parse_conf(char *conf_path, struct sockaddr_in* cmd_addr, struct sockaddr_in
             struct stat st;
             // 检查目录是否存在
             if (stat(store_dir, &st) == 0) {
-                if (S_ISDIR(st.st_mode)) {
-                    return 0;  // 目录已存在
-                }
-                exit(-1);  // 路径存在但不是目录
+                if(!S_ISDIR(st.st_mode)){exit(-1);}// 路径存在但不是目录
+            }else{
+                // 创建目录（设置权限为755）
+                if (mkdir(store_dir, 0755) != 0) {
+                    printf("fail create store_dir!\n");
+                    exit(-1);
+                }    
             }
-            // 创建目录（设置权限为755）
-            if (mkdir(store_dir, 0755) != 0) {
-                printf("fail create store_dir!\n");
+        }else if(memcmp("mysql_host", line, strlen("mysql_host")) == 0){
+            extern char MYSQL_HOST[64];
+            memset(MYSQL_HOST, 0, sizeof(MYSQL_HOST));
+            if(strlen(t) > sizeof(MYSQL_HOST)){
+                perror("mysql_host err");
                 exit(-1);
             }
+            memcpy(MYSQL_HOST, t, strlen(t));
+        }else if(memcmp("mysql_username", line, strlen("mysql_username")) == 0){
+            extern char MYSQL_USERNAME[256];
+            memset(MYSQL_USERNAME, 0, sizeof(MYSQL_USERNAME));
+            if(strlen(t) > sizeof(MYSQL_USERNAME)){
+                perror("mysql_username err");
+                exit(-1);
+            }
+            memcpy(MYSQL_USERNAME, t, strlen(t));
+        }else if(memcmp("mysql_passwd", line, strlen("mysql_passwd")) == 0){
+            extern char MYSQL_PASSWD[256];
+            memset(MYSQL_PASSWD, 0, sizeof(MYSQL_PASSWD));
+            if(strlen(t) > sizeof(MYSQL_PASSWD)){
+                perror("mysql_passwd err");
+                exit(-1);
+            }
+            memcpy(MYSQL_PASSWD, t, strlen(t));
+        }else if(memcmp("database_name", line, strlen("database_name")) == 0){
+            extern char DATABASE_NAME[256];
+            memset(DATABASE_NAME, 0, sizeof(DATABASE_NAME));
+            if(strlen(t) > sizeof(DATABASE_NAME)){
+                perror("database_name err");
+                exit(-1);
+            }
+            memcpy(DATABASE_NAME, t, strlen(t));
         }
         line = strtok(NULL, "\n");
     }

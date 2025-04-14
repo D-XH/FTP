@@ -297,6 +297,7 @@ void* subThread_put(void* arg){
                 break;
             }
             cnt += rsize;
+            sleep(0.0001);
         }
     }
 
@@ -362,6 +363,7 @@ void* subThread_get(void* arg){
         pthread_exit(NULL);
     }
 
+    // send validation
     send_val(sock_fd, 0, name_token);
 
     int code = 0;
@@ -383,18 +385,18 @@ void* subThread_get(void* arg){
 
     memset(resp, 0, sizeof(resp));
     recv_resp(sock_fd, &code, resp, NULL);
-    if(code == 503){
+    if(code == 501){
         printf("code: %d, %s\n", code, resp);
         free(th_args);
         close(file_fd);
         close(sock_fd);
         pthread_exit(NULL);
     }
-
-    int cnt = 0;
-    data_t data;
+    
+    // data_t data;
     lseek(file_fd, file_size, SEEK_SET);
     while(1){
+        data_t data;
         memset(&data, 0, sizeof(data));
         recvn(sock_fd, &data.size, sizeof(data.size));
         recvn(sock_fd, data.buf, data.size);
@@ -402,7 +404,6 @@ void* subThread_get(void* arg){
             break;
         }
         write(file_fd, data.buf, data.size);
-        cnt += data.size;
     }
     
     lseek(file_fd, 0, SEEK_SET);
@@ -416,6 +417,7 @@ void* subThread_get(void* arg){
     if(strncmp(cli_md5, ser_md5, sizeof(cli_md5)) == 0){
         printf("download successful!\n");
     }else{
+        printf("download failed!\n");
         unlink(cli_path);
     }
 
@@ -517,7 +519,7 @@ int main(int argc, char* argv[]){
                         break;
                     default:
                         // printf("\r%s\n", resp);
-                        if(code / 100 == 5 || code == 220 || code == 257 || code == 258){
+                        if(code / 100 == 5 || code == 220 || code == 257 || code == 258 || code == 259){
                             printf("\r%s\n", resp);
                         }
                         break;

@@ -34,6 +34,7 @@ void *handler(void *arg)
             disconnect_mysql(mysql, NULL);
             pthread_mutex_unlock(&pThreadPool->mutex);
             send_resp(net_fd, 503, "val failed!", -1);
+            printf("%d end work ...\n", net_fd);
             continue;
         }
         pthread_mutex_unlock(&pThreadPool->mutex);
@@ -98,7 +99,7 @@ int put_work(int net_fd, MYSQL* mysql, threadPool_t* pool, tree_node_t* node){
         sprintf(query, "update disk set tomb=0 where filepath='%s' and uid=%d;", new_cwd, node->uid);
         mysql_query(mysql, query);
         close(file_fd);
-        send_resp(net_fd, 200, "upload successful!", -1);
+        send_resp(net_fd, 259, "upload successful!", -1);
     }else{
         // failed
         printf("failed\n");
@@ -111,12 +112,14 @@ int put_work(int net_fd, MYSQL* mysql, threadPool_t* pool, tree_node_t* node){
 }
 
 int get_work(int net_fd, MYSQL* mysql, threadPool_t* pool, tree_node_t* node){
+    // recv server path
     char ser_path[256] = {0};
     recv_one_data(net_fd, ser_path);
 
+    // recv file offset
     off_t file_off = 0;
     recv_one_data(net_fd, &file_off);
-
+    
     char new_cwd[256] = {0};
     char old_cwd[256] = {0};
     pthread_mutex_lock(&pool->mutex);
@@ -147,7 +150,9 @@ int get_work(int net_fd, MYSQL* mysql, threadPool_t* pool, tree_node_t* node){
 
         int file_fd = open(file_path, O_RDWR);
         if(file_fd == -1){
+            perror("get: openfile");
             send_resp(net_fd, 501, "server err, no such file!", -1);
+            return 0;
         }else{
             send_resp(net_fd, 350, "continue!", -1);
         }

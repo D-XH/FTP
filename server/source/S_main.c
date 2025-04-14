@@ -9,13 +9,17 @@
 #include "timeRound.h"
 
 char store_dir[256] = "./disk";
+char MYSQL_HOST[64] = "localhost";
+char MYSQL_USERNAME[256] = "deng";
+char MYSQL_PASSWD[256] = "deng";
+char DATABASE_NAME[256] = "cloudDisk";
 
 int main(int argc, char* argv[]){
     if(argc != 2){
         perror("main args");
         return -1;
     }
-
+    
     threadPool_t pool;
     threadPool_init(&pool, 3);
 
@@ -23,6 +27,7 @@ int main(int argc, char* argv[]){
     int sock_fd_data = -1;
     struct sockaddr_in cmd_addr, data_addr;
     parse_conf(argv[1], &cmd_addr, &data_addr);
+
     tcpInit(&sock_fd_cmd, &cmd_addr, 50);
     tcpInit(&sock_fd_data, &data_addr, 50);
     printf("cmd: %d, data: %d\n", ntohs(cmd_addr.sin_port), ntohs(data_addr.sin_port));

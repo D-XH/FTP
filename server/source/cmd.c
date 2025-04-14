@@ -334,7 +334,6 @@ int create_new_dir(int net_fd, char* dirpath, MYSQL* mysql, threadPool_t* pool, 
             send_resp(net_fd, 200, "mkdir successful!", -1);
             return 0;
         }
-        mysql_free_result(query_res);
 
         memset(query, 0, sizeof(query));
         if(strlen(new_cwd) != 1){
@@ -534,7 +533,7 @@ int put_file(int net_fd, char* cli_path, char* ser_path, MYSQL* mysql, threadPoo
         send_resp(net_fd, 501, "no such file or directory!", -1);
     }else if(st_ret == 0){
         printf("second trans successful!\n");
-        send_resp(net_fd, 200, "upload successfully!", -1);
+        send_resp(net_fd, 259, "upload successfully!", -1);
     }else{
         send_resp(net_fd, 350, "can't implement second_trans", -1);
     }

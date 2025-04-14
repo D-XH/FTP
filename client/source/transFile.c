@@ -1,10 +1,10 @@
 #include "transFile.h"
 
-ssize_t recvn(int net_fd, void* data, ssize_t n){
+size_t recvn(int net_fd, void* data, size_t n){
     char* p = (char*)data;
-    ssize_t cnt = 0;
+    size_t cnt = 0;
     while(cnt < n){
-        ssize_t rsize = recv(net_fd, p, n, 0);
+        size_t rsize = recv(net_fd, p, n, 0);
         if(rsize == 0){
             return 0;
         }

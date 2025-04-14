@@ -6,9 +6,10 @@ MYSQL* connect_mysql()
     if(mysql == NULL){
         printf("%s\n", mysql_error(mysql));
     }
-    mysql = mysql_real_connect(mysql, "localhost", "deng", "deng", "cloudDisk", 0, NULL, 0);
+    mysql = mysql_real_connect(mysql, MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWD, DATABASE_NAME, 0, NULL, 0);
     if(mysql == NULL){
         printf("%s\n", mysql_error(mysql));
+        exit(-1);
     }
     return mysql;
 }

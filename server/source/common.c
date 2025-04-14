@@ -101,6 +101,7 @@ int send_data(int net_fd, data_t* data, int type){
 // 231: exit successful
 // 257: resp of pwd --> pwd string
 // 258: resp of ls --> ls string
+// 259: upload successful
 // 350: 
 // 501: arg err
 // 502: upload failed
@@ -221,9 +222,8 @@ int trans_recv(int net_fd, int file_fd, off_t file_size, unsigned char* ser_md5)
 int trans_send(int net_fd, int file_fd, off_t file_off){
     
     // normal
-    int cnt = file_off;
     data_t data;
-    lseek(file_fd, cnt, SEEK_SET);
+    lseek(file_fd, file_off, SEEK_SET);
     while(1){
         memset(&data, 0, sizeof(data));
         ssize_t rsize = read(file_fd, data.buf, sizeof(data.buf));
@@ -232,6 +232,6 @@ int trans_send(int net_fd, int file_fd, off_t file_off){
         if(rsize == 0){
             break;
         }
-        cnt += rsize;
+        sleep(0.0001);
     }
 }
