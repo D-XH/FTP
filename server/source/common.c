@@ -223,15 +223,24 @@ int trans_send(int net_fd, int file_fd, off_t file_off){
     
     // normal
     data_t data;
+    struct tcp_info info;
+    socklen_t len = sizeof(info);
     lseek(file_fd, file_off, SEEK_SET);
     while(1){
         memset(&data, 0, sizeof(data));
         ssize_t rsize = read(file_fd, data.buf, sizeof(data.buf));
         data.size = rsize;
-        send(net_fd, &data, sizeof(data.size)+data.size, MSG_NOSIGNAL);
+
+        size_t send_size = sizeof(data.size)+data.size;
+        getsockopt(net_fd, IPPROTO_TCP, TCP_INFO, &info, &len);
+        if (info.tcpi_rcv_space - send_size < info.tcpi_rcv_ssthresh) {
+            // 接收空间接近阈值
+            sleep(0.001);
+        }
+
+        ssize_t ssize = send(net_fd, &data, send_size, MSG_NOSIGNAL);
         if(rsize == 0){
             break;
         }
-        sleep(0.0001);
     }
 }

@@ -5,6 +5,7 @@
 #include "stack.h"
 #include <openssl/aes.h>
 #include <openssl/md5.h>
+#include <linux/tcp.h> 
 
 int encrypt_str(unsigned char* in, unsigned char* out, unsigned char* userkey);
 int decrypt_str(unsigned char* in, ssize_t in_len, unsigned char* out, unsigned char* userkey);

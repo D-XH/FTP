@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <netinet/in.h>
 #include <openssl/md5.h>
+#include <linux/tcp.h> 
 
 #include "transFile.h"
 #include "parseConf.h"
@@ -281,6 +282,8 @@ void* subThread_put(void* arg){
     send_one_data(sock_fd, &file_size, sizeof(file_size));
     printf("file size: %ld\n", file_size);
 
+    struct tcp_info info;
+    socklen_t len = sizeof(info);
     if(file_size > 100*1024*1024){
         char* p = (char*)mmap(NULL, file_size, PROT_READ|PROT_WRITE, MAP_SHARED, file_fd, 0);
         send(sock_fd, p, file_size, MSG_NOSIGNAL);
@@ -292,18 +295,26 @@ void* subThread_put(void* arg){
             memset(&data, 0, sizeof(data));
             ssize_t rsize = read(file_fd, data.buf, sizeof(data.buf));
             data.size = rsize;
+
+            size_t send_size = sizeof(data.size)+data.size;
+            getsockopt(sock_fd, IPPROTO_TCP, TCP_INFO, &info, &len);
+            if (info.tcpi_rcv_space - send_size < info.tcpi_rcv_ssthresh) {
+                // 接收空间接近阈值
+                sleep(0.001);
+            }
+
             send(sock_fd, &data, sizeof(data.size)+data.size, MSG_NOSIGNAL);
             if(rsize == 0){
                 break;
             }
             cnt += rsize;
-            sleep(0.0001);
         }
     }
 
     memset(resp, 0, sizeof(resp));
     recv_resp(sock_fd, &code, resp, NULL);
     printf("\r%s\n", resp);
+
     free(th_args);
     close(file_fd);
     close(sock_fd);
