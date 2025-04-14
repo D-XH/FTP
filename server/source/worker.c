@@ -30,7 +30,7 @@ void *handler(void *arg)
 
         pthread_mutex_lock(&pThreadPool->mutex);
         tree_node_t* node = se_login_user(&pThreadPool->loginInfo, token);
-        if(node == NULL || valToken(username, token) == -1){
+        if(node == NULL || valToken(username, node->login_time, token) == -1){
             disconnect_mysql(mysql, NULL);
             pthread_mutex_unlock(&pThreadPool->mutex);
             send_resp(net_fd, 503, "val failed!", -1);
@@ -146,6 +146,11 @@ int get_work(int net_fd, MYSQL* mysql, threadPool_t* pool, tree_node_t* node){
         strcat(file_path, row[1]);
 
         int file_fd = open(file_path, O_RDWR);
+        if(file_fd == -1){
+            send_resp(net_fd, 501, "server err, no such file!", -1);
+        }else{
+            send_resp(net_fd, 350, "continue!", -1);
+        }
         trans_send(net_fd, file_fd, file_off);
         close(file_fd);
 

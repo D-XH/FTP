@@ -1,7 +1,7 @@
 #include "cmd.h"
 
 int user_register(int net_fd, char* username, char* password, MYSQL* mysql);
-int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadPool_t* pool);
+int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadPool_t* pool, timeRound_t* time_round);
 int change_dir(int net_fd, char* path, MYSQL* mysql, threadPool_t* pool, tree_node_t* node);
 int list_dir(int net_fd, char* path, MYSQL* mysql, threadPool_t* pool, tree_node_t* node);
 int print_work_dir(int net_fd, threadPool_t* pool, tree_node_t* node);
@@ -11,7 +11,7 @@ int put_file(int net_fd, char* cli_path, char* ser_path, MYSQL* mysql, threadPoo
 int get_file(int net_fd, char* cli_path, char* ser_path, MYSQL* mysql, threadPool_t* pool, tree_node_t* node);
 int user_logout(int net_fd, threadPool_t* pool, char* token);
 
-int process_cmd(int net_fd, threadPool_t* pool){
+int process_cmd(int net_fd, threadPool_t* pool, timeRound_t* time_round){
     char username[256] = {0};
     char token[256] = {0};
     recv_username_token(net_fd, username, token);
@@ -37,20 +37,29 @@ int process_cmd(int net_fd, threadPool_t* pool){
         pthread_mutex_lock(&pool->mutex);
         tree_node_t* node = se_login_user(&pool->loginInfo, token);
         pthread_mutex_unlock(&pool->mutex);
-        if(node != NULL && valToken(username, token) == 0){
+        if(node != NULL && valToken(username, node->login_time, token) == 0){
             send_resp(net_fd, 504, "have logined, logout firsetly!", -1);
         }else{
-            user_login(net_fd, cmd_msg.argv[0], cmd_msg.argv[1], mysql, pool);
+            user_login(net_fd, cmd_msg.argv[0], cmd_msg.argv[1], mysql, pool, time_round);
         }
     }else{
+        // validation 
         pthread_mutex_lock(&pool->mutex);
         tree_node_t* node = se_login_user(&pool->loginInfo, token);
         pthread_mutex_unlock(&pool->mutex);
-        if(node == NULL || valToken(username, token) == -1){
+        if(node == NULL || valToken(username, node->login_time, token) == -1){
             send_resp(net_fd, 530, "login validation failed, please relogin!", -1);
             disconnect_mysql(mysql, NULL);
             return 0;
         }
+        // keep active
+        timeRound_del(time_round, node->timeRound_idx, node->token);
+        timeRound_add(time_round, node->token);
+        pthread_mutex_lock(&pool->mutex);
+        node->timeRound_idx = time_round->cur_idx;
+        pthread_mutex_unlock(&pool->mutex);
+
+        // process
         if(cmd_msg.type == CD){
             change_dir(net_fd, cmd_msg.argv[0], mysql, pool, node);
         }else if(cmd_msg.type == LS){
@@ -117,7 +126,7 @@ int user_register(int net_fd, char* username, char* password, MYSQL* mysql){
     return 0;
 }
 
-int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadPool_t* pool){
+int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadPool_t* pool, timeRound_t* time_round){
     char query[256] = {0};
     sprintf(query, "select uid,passwd from users where username='%s' and tomb=0;", username);
     mysql_query(mysql, query);
@@ -139,7 +148,8 @@ int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadP
     
     if(memcmp(row[1], crypt_passwd, strlen(row[1])) == 0){
         char token[256] = {0};
-        if(getToken(username, token) == -1){
+        time_t login_time = time(NULL);
+        if(getToken(username, login_time, token) == -1){
             printf("gettoken failed\n");
             return -1;
         }
@@ -154,7 +164,8 @@ int user_login(int net_fd, char* username, char* password, MYSQL* mysql, threadP
 
         // store fd->username
         pthread_mutex_lock(&pool->mutex);
-        add_login_user(&pool->loginInfo, net_fd, atoi(row[0]), token);
+        tree_node_t* node = add_login_user(&pool->loginInfo, net_fd, atoi(row[0]), token, login_time, time_round->cur_idx);
+        timeRound_add(time_round, node->token);
         pthread_mutex_unlock(&pool->mutex);
     }else{
         send_resp(net_fd, 530, "login failed, please check password!", -1);

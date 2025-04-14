@@ -204,7 +204,7 @@ int statTree_init(statTree_t *tree)
     return 0;
 }
 
-int add_login_user(statTree_t *tree, int fd, int uid, char* token)
+tree_node_t* add_login_user(statTree_t *tree, int fd, int uid, char* token, time_t login_time, int time_round_idx)
 {
     tree_node_t* node = (tree_node_t*)malloc(sizeof(tree_node_t));
     memset(node, 0, sizeof(tree_node_t));
@@ -213,13 +213,15 @@ int add_login_user(statTree_t *tree, int fd, int uid, char* token)
     node->high = 1;
     node->uid = uid;
     node->lchild = node->rchild = NULL;
+    node->login_time = login_time;
+    node->timeRound_idx = time_round_idx;
     if(find(tree->root, token) == NULL){
         insertTree(&tree->root, node);
         tree->size++;
     }else{
         changeFromTree(tree->root, fd, uid, token);
     }
-    return 0;
+    return node;
 }
 
 int del_login_user(statTree_t *tree, char* token){

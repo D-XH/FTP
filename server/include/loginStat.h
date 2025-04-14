@@ -11,6 +11,8 @@ typedef struct tree_node_s{
     int fd;
     int uid;
     dir_stack_t cwd;
+    time_t login_time;
+    int timeRound_idx;
     int high;
     struct tree_node_s* lchild;
     struct tree_node_s* rchild;
@@ -23,7 +25,7 @@ typedef struct statTree_s{
 
 void printTree(tree_node_t *root);
 int statTree_init(statTree_t* tree);
-int add_login_user(statTree_t* tree, int fd, int uid, char* token);
+tree_node_t* add_login_user(statTree_t* tree, int fd, int uid, char* token, time_t login_time, int time_round_idx);
 int del_login_user(statTree_t *tree, char* token);
 tree_node_t* se_login_user(statTree_t *tree, char* token);
 

@@ -6,6 +6,7 @@
 #include "threadPool.h"
 #include "mysqlConn.h"
 #include "common.h"
+#include "timeRound.h"
 #include <crypt.h>
 
 enum op{
@@ -29,6 +30,6 @@ typedef struct command_s{
     char argv[2][256];
 }command_t;
 
-int process_cmd(int net_fd, threadPool_t* pool);
+int process_cmd(int net_fd, threadPool_t* pool, timeRound_t* time_round);
 
 #endif

@@ -300,6 +300,9 @@ void* subThread_put(void* arg){
         }
     }
 
+    memset(resp, 0, sizeof(resp));
+    recv_resp(sock_fd, &code, resp, NULL);
+    printf("\r%s\n", resp);
     free(th_args);
     close(file_fd);
     close(sock_fd);
@@ -377,6 +380,16 @@ void* subThread_get(void* arg){
 
     // send offset
     send_one_data(sock_fd, &file_size, sizeof(file_size));
+
+    memset(resp, 0, sizeof(resp));
+    recv_resp(sock_fd, &code, resp, NULL);
+    if(code == 503){
+        printf("code: %d, %s\n", code, resp);
+        free(th_args);
+        close(file_fd);
+        close(sock_fd);
+        pthread_exit(NULL);
+    }
 
     int cnt = 0;
     data_t data;

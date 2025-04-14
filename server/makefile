@@ -20,7 +20,7 @@ $(TARGET):$(OBJS)
 	gcc $^ -o $@ $(LIB)
 
 $(DIR_DEBUG)/%.o:$(DIR_SRCS)/%.c
-	gcc -c $^ -o $@ -I $(DIR_INC) 
+	gcc -c $^ -o $@ -I $(DIR_INC)
 
 clean:
 	rm -r $(TARGET) $(DIR_DEBUG)
