@@ -49,6 +49,7 @@ void *handler(void *arg)
         // put: net_fd, ser_path, cli_md5
         // get: net_fd, ser_path, cli_size
         printf("%d end work ...\n", net_fd);
+        close(net_fd);
     }
     pthread_exit(NULL);
 }
