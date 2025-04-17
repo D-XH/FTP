@@ -62,15 +62,17 @@ int main(int argc, char* argv[]){
                 }
             }
         }
-        // time round implement kick
-        linkLisk_node_t* p = timeRound_step(&time_round);
-        while(p){
-            linkLisk_node_t* t = p;
-            p = p->next;
-            del_login_user(&pool.loginInfo, t->token);
-            free(t);
+        if(ready_num == 0){
+            // time round implement kick
+            linkLisk_node_t* p = timeRound_step(&time_round);
+            while(p){
+                linkLisk_node_t* t = p;
+                p = p->next;
+                del_login_user(&pool.loginInfo, t->token);
+                free(t);
+            }
+            time_round.round[time_round.cur_idx] = NULL;
         }
-        time_round.round[time_round.cur_idx] = NULL;
 
     }
     return 0;
