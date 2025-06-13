@@ -2,10 +2,10 @@
 ## database
 ```mysql
 # 1. create database
-create database cloudDisk;
+create database ftp;
 
 # 2. change database
-use cloudDisk
+use ftp
 
 # 3. create `users` table
 CREATE TABLE `users` (
