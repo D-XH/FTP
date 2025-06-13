@@ -1,11 +1,11 @@
-# A simple FTP project
+# A simple cloudDisk project
 ## database
 ```mysql
 # 1. create database
-create database ftp;
+create database cloudDisk;
 
 # 2. change database
-use ftp
+use cloudDisk
 
 # 3. create `users` table
 CREATE TABLE `users` (
