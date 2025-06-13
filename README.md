@@ -1,4 +1,4 @@
-# A simple cloudDisk project
+# A simple FTP project
 ## database
 ```mysql
 # 1. create database
